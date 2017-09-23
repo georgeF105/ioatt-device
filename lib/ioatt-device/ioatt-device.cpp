@@ -86,6 +86,11 @@ void IOATTDevice::setDeviceActualValue(boolean value) {
     Firebase.setBool(String("devices/") + String(_deviceKey) + String("/outputs/state/actualValue"), value);
 }
 
+void IOATTDevice::setDeviceValue(boolean value) {
+    Firebase.setBool(String("devices/") + String(_deviceKey) + String("/outputs/state/actualValue"), value);
+    Firebase.setString(String("devices/") + String(_deviceKey) + String("/outputs/state/setBy"), "DEVICE");
+}
+
 boolean IOATTDevice::fetchDeviceKeyFromEEPROM () {
     _deviceKeyLength = EEPROM.read(DEVICE_KEY_LENGTH_ADDRESS);
     if (_deviceKeyLength < DEVICE_KEY_MIN_LENGTH || _deviceKeyLength > DEVICE_KEY_MAX_LENGTH) {

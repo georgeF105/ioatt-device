@@ -31,6 +31,7 @@ class IOATTDevice {
     String deviceKey();
     boolean getOutputTargetValue();
     void setDeviceActualValue(boolean value);
+    void setDeviceValue(boolean value);
     SensorConfig getSensorConfig ();
     void pushSensorData (float temperature, float humidity);
     OutputConfig getOutputConfig ();

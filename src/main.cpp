@@ -34,6 +34,11 @@ DHT dht (DHT_PIN, DHT_TYPE);
 SensorConfig sensorConfig;
 OutputConfig outputConfig;
 
+#define INPUT_BUTTON_PIN 0
+#define INPUT_BUTTON_ON LOW
+#define INPUT_BUTTON_OFF HIGH
+boolean currentOutputState;
+
 void setup() {
     Serial.begin(115200);
     Serial.print("Starting Version: ");
@@ -42,6 +47,7 @@ void setup() {
     Serial.println(TYPE);
 
     pinMode(LED_PIN, OUTPUT);
+    pinMode(INPUT_BUTTON_PIN, INPUT_PULLUP);
 
     delay (500);    
     ioattDevice.startUp();
@@ -72,22 +78,34 @@ void checkAndPushSensorData () {
     }
 }
 
+void setOutputState (boolean state) {
+    currentOutputState = state;
+    if (state) {
+        Serial.println("Setting pin to on");
+        digitalWrite(outputConfig.pin, INPUT_BUTTON_ON);
+        ioattDevice.setDeviceActualValue(true);
+    } else {
+        Serial.println("Setting pin to off");
+        digitalWrite(outputConfig.pin, INPUT_BUTTON_OFF);
+        ioattDevice.setDeviceActualValue(false);
+    }
+}
+
 void pollAndUpdateOutputs () {
     if (lastOutputPollTime + outputConfig.pollRate < millis()) {
         lastOutputPollTime = millis();
-        if (ioattDevice.getOutputTargetValue()) {
-            Serial.println("Setting pin to high");
-            digitalWrite(outputConfig.pin, HIGH);
-            ioattDevice.setDeviceActualValue(true);
-        } else {
-            Serial.println("Setting pin to low");
-            digitalWrite(outputConfig.pin, LOW);
-            ioattDevice.setDeviceActualValue(false);
-        }
+        setOutputState(ioattDevice.getOutputTargetValue());
     }
 }
 
 void loop() {
+    if (digitalRead(INPUT_BUTTON_PIN) == INPUT_BUTTON_ON) {
+        Serial.println("Button pushed");
+        currentOutputState = !currentOutputState;
+        setOutputState(currentOutputState);
+        ioattDevice.setDeviceValue(currentOutputState);
+    }
+
     pollAndUpdateOutputs();
     checkAndPushSensorData();
 
