@@ -14,10 +14,13 @@
 #define DEVICE_KEY_MAX_LENGTH 12
 #define DEVICE_KEY_LENGTH_ADDRESS 2
 
-#define POLL_REFRESH_RATE 20000
-
 struct SensorConfig {
   String type;
+  int pollRate;
+};
+
+struct OutputConfig {
+  int pin;
   int pollRate;
 };
 
@@ -26,9 +29,11 @@ class IOATTDevice {
     IOATTDevice(const char *version, const char *type, const char *firebaseHost, const char *firebaseAuth);
     void startUp (void);
     String deviceKey();
-    boolean getDeviceKeyValue(char *key);
+    boolean getOutputTargetValue();
+    void setDeviceActualValue(boolean value);
     SensorConfig getSensorConfig ();
     void pushSensorData (float temperature, float humidity);
+    OutputConfig getOutputConfig ();
 
   private:
     const char *_version;
@@ -39,6 +44,7 @@ class IOATTDevice {
     byte _deviceKeyLength;
     String _macAddress;
     boolean _shouldSaveConfig = false;
+    OutputConfig _outputConfig;
     StaticJsonBuffer<200> _jsonBuffer;
     JsonObject* _currentSensorData;
     // void saveConfigCallback ();

@@ -65,24 +65,25 @@ SensorConfig IOATTDevice::getSensorConfig() {
     return config;
 }
 
-void IOATTDevice::pushSensorData(float temperature, float humidity) {
-    Serial.println("Pusing sensor data");
-    Serial.print("temperature: ");
-    Serial.println(temperature);
-    Serial.print("humidity: ");
-    Serial.println(humidity);
-    
+OutputConfig IOATTDevice::getOutputConfig() {
+    _outputConfig.pollRate = Firebase.getInt(String("devices/") + String(_deviceKey) + String("/outputs/config/pollRate"));
+    _outputConfig.pin = Firebase.getInt(String("devices/") + String(_deviceKey) + String("/outputs/config/pin"));
+    return _outputConfig;
+}
+
+void IOATTDevice::pushSensorData(float temperature, float humidity) {    
     _currentSensorData->set("temperature", temperature);
     _currentSensorData->set("humidity", humidity);
     Firebase.push(String("devices/") + String(_deviceKey) + String("/sensor/data"), JsonVariant(*_currentSensorData));
-    _currentSensorData->printTo(Serial);
     checkForFirebaseError();
 }
 
-boolean IOATTDevice::getDeviceKeyValue(char *key) {
-  boolean value = Firebase.getBool(String("devices/") + String(_deviceKey) + String("/state/") + String(key) + String("/value"));
-  Firebase.setBool(String("devices/") + String(_deviceKey) + String("/state/") + String(key) + String("/updated"), false);
-  return value;
+boolean IOATTDevice::getOutputTargetValue() {
+  return Firebase.getBool(String("devices/") + String(_deviceKey) + String("/outputs/state/targetValue"));
+}
+
+void IOATTDevice::setDeviceActualValue(boolean value) {
+    Firebase.setBool(String("devices/") + String(_deviceKey) + String("/outputs/state/actualValue"), value);
 }
 
 boolean IOATTDevice::fetchDeviceKeyFromEEPROM () {

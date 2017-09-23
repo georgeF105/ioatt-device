@@ -20,17 +20,19 @@
 #define CURRENT_VERSION "0.0.3"
 #define TYPE "D1_MINI_DHT"
 
-#define LED_PIN 2
+#define DHT_SENSOR_TYPE "DHT"
 #define DHT_PIN D4
 #define DHT_TYPE DHT22
+unsigned long lastSensorPollTime;
 
-#define POLL_REFRESH_RATE 20000
-unsigned long lastPollTime;
+#define LED_PIN 2
+unsigned long lastOutputPollTime;
 
 IOATTDevice ioattDevice ("0.0.3", TYPE, FIREBASE_HOST, FIREBASE_AUTH);
 DHT dht (DHT_PIN, DHT_TYPE);
 
 SensorConfig sensorConfig;
+OutputConfig outputConfig;
 
 void setup() {
     Serial.begin(115200);
@@ -44,32 +46,50 @@ void setup() {
     delay (500);    
     ioattDevice.startUp();
     sensorConfig = ioattDevice.getSensorConfig();
+    outputConfig = ioattDevice.getOutputConfig();
     dht.begin();
     Serial.println("done setup");
     Serial.print("SensorConfig.type: ");
     Serial.println(sensorConfig.type);
     Serial.print("SensorConfig.pollRate: ");
     Serial.println(sensorConfig.pollRate);
+
+    Serial.print("outputConfig.pollRate: ");
+    Serial.println(outputConfig.pollRate);
+    Serial.print("outputConfig.pin: ");
+    Serial.println(outputConfig.pin);
+    pinMode(outputConfig.pin, OUTPUT);
+}
+
+void checkAndPushSensorData () {
+    if (lastSensorPollTime + sensorConfig.pollRate < millis()) {
+        lastSensorPollTime = millis();
+
+        if (sensorConfig.type == DHT_SENSOR_TYPE) {
+            Serial.println("getting and pushing sensor data");
+            ioattDevice.pushSensorData(dht.readTemperature(), dht.readHumidity());
+        }
+    }
+}
+
+void pollAndUpdateOutputs () {
+    if (lastOutputPollTime + outputConfig.pollRate < millis()) {
+        lastOutputPollTime = millis();
+        if (ioattDevice.getOutputTargetValue()) {
+            Serial.println("Setting pin to high");
+            digitalWrite(outputConfig.pin, HIGH);
+            ioattDevice.setDeviceActualValue(true);
+        } else {
+            Serial.println("Setting pin to low");
+            digitalWrite(outputConfig.pin, LOW);
+            ioattDevice.setDeviceActualValue(false);
+        }
+    }
 }
 
 void loop() {
-    if (ioattDevice.getDeviceKeyValue("led")) {
-        Serial.println("Setting pin to high");
-        digitalWrite(LED_PIN, HIGH);
-    } else {
-        Serial.println("Setting pin to low");
-        digitalWrite(LED_PIN, LOW);
-    }
+    pollAndUpdateOutputs();
+    checkAndPushSensorData();
 
-    float temperature = dht.readTemperature();
-    float humidity = dht.readHumidity();
-
-    Serial.print("Current temperature: ");
-    Serial.println(temperature);
-    Serial.print("Current humidity: ");
-    Serial.println(humidity);
-
-    ioattDevice.pushSensorData(temperature, humidity);
-
-    delay(10000);
+    delay(10);
 }
