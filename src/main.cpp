@@ -9,6 +9,7 @@
 #include <FirebaseArduino.h>
 #include <EEPROM.h>
 
+#include <Adafruit_Sensor.h>
 #include <DHT.h>
 
 #include "config.h"
@@ -29,6 +30,8 @@ unsigned long lastPollTime;
 IOATTDevice ioattDevice ("0.0.3", TYPE, FIREBASE_HOST, FIREBASE_AUTH);
 DHT dht (DHT_PIN, DHT_TYPE);
 
+SensorConfig sensorConfig;
+
 void setup() {
     Serial.begin(115200);
     Serial.print("Starting Version: ");
@@ -40,8 +43,13 @@ void setup() {
 
     delay (500);    
     ioattDevice.startUp();
+    sensorConfig = ioattDevice.getSensorConfig();
     dht.begin();
     Serial.println("done setup");
+    Serial.print("SensorConfig.type: ");
+    Serial.println(sensorConfig.type);
+    Serial.print("SensorConfig.pollRate: ");
+    Serial.println(sensorConfig.pollRate);
 }
 
 void loop() {
@@ -60,6 +68,8 @@ void loop() {
     Serial.println(temperature);
     Serial.print("Current humidity: ");
     Serial.println(humidity);
+
+    ioattDevice.pushSensorData(temperature, humidity);
 
     delay(10000);
 }

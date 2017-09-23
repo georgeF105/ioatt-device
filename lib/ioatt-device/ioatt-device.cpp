@@ -18,6 +18,9 @@ IOATTDevice::IOATTDevice(const char *version, const char *type, const char *fire
     _firebaseAuth = firebaseAuth;
     _macAddress = WiFi.macAddress();
     _shouldSaveConfig = false;
+
+    JsonObject& currentSensorData = _jsonBuffer.createObject();
+    _currentSensorData = &currentSensorData;
 }
 
 void IOATTDevice::startUp(void) {
@@ -53,6 +56,27 @@ void IOATTDevice::startUp(void) {
 
 String IOATTDevice::deviceKey() {
     return String(_deviceKey);
+}
+
+SensorConfig IOATTDevice::getSensorConfig() {
+    SensorConfig config;
+    config.type = Firebase.getString(String("devices/") + String(_deviceKey) + String("/sensor/config/type"));
+    config.pollRate = Firebase.getInt(String("devices/") + String(_deviceKey) + String("/sensor/config/pollRate"));
+    return config;
+}
+
+void IOATTDevice::pushSensorData(float temperature, float humidity) {
+    Serial.println("Pusing sensor data");
+    Serial.print("temperature: ");
+    Serial.println(temperature);
+    Serial.print("humidity: ");
+    Serial.println(humidity);
+    
+    _currentSensorData->set("temperature", temperature);
+    _currentSensorData->set("humidity", humidity);
+    Firebase.push(String("devices/") + String(_deviceKey) + String("/sensor/data"), JsonVariant(*_currentSensorData));
+    _currentSensorData->printTo(Serial);
+    checkForFirebaseError();
 }
 
 boolean IOATTDevice::getDeviceKeyValue(char *key) {

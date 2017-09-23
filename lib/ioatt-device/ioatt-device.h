@@ -16,12 +16,19 @@
 
 #define POLL_REFRESH_RATE 20000
 
+struct SensorConfig {
+  String type;
+  int pollRate;
+};
+
 class IOATTDevice {
   public:
     IOATTDevice(const char *version, const char *type, const char *firebaseHost, const char *firebaseAuth);
     void startUp (void);
     String deviceKey();
     boolean getDeviceKeyValue(char *key);
+    SensorConfig getSensorConfig ();
+    void pushSensorData (float temperature, float humidity);
 
   private:
     const char *_version;
@@ -32,6 +39,8 @@ class IOATTDevice {
     byte _deviceKeyLength;
     String _macAddress;
     boolean _shouldSaveConfig = false;
+    StaticJsonBuffer<200> _jsonBuffer;
+    JsonObject* _currentSensorData;
     // void saveConfigCallback ();
     boolean fetchDeviceKeyFromEEPROM (void);
     void saveDeviceKeyToEEPROM ();
