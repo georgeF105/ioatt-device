@@ -48,3 +48,4 @@ deploy:
     - "d1_mini.bin"
   on:
     repo: georgeF105/ioatt-device
+    tags: true
