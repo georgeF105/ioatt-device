@@ -40,8 +40,11 @@ deploy:
   skip_cleanup: true
   api_key:
     secure: sIswHS7uMro+IEW+N+GAAa+vB546/RCto2s1UAsCMcmfbSuWWDReVoH1LnbAV2wSVPF0NjcMIyhm5YzDCI1pRdooFTDkE9X5paLM60eduTGY41jKfFCWBWl/cHPjyZYiFpDKd2OmJnK8WNsMp0Qr2K1DAzlmPwPs6u7E3vePJGtgJjadbuvw/vchOCcO/VI4tV8SOIeQLiUhpxeV3Qu1f0V9v/E4BnDYseX7LR4oXHSHzATmhVcILXkET7thfCowuC8yHZVuryleW4YM6pwczj1bJZKZn19pJoFh3rF3Q8J6xIFMULSJ3f4ege6WvAvvi0+5yoyAVvrQEkr2e+im4IBtNVIoMgQwZ94i9d7XS3xcZxbp8Fn7/xl/74E+UsJ0FlUymWqojt0bCemJhk7cjr0p8gJA29cCQXqFg1Hfgszt/T23QtVysilZGZpKogGmZYb/Q3n//WxgdRLgcSGySv9a43Vv5wwPnlYzulxJYg8QUwnYnrltFpG+8qhaOo2EQAdjC28+Ud5Nopt4c6jJluSE5aPm+pjo+LHAJgZvb+BME+D6JEb5MzdZa06M97c+VLiYTpBdDuhkPUFcLNTR22/E1HUJNK4Ju1PK03IUU/5uGXM7uJb1ZiALienEq04X3djxkOhQRFW1FSjW/gpNyre1OL9C+plpM8mRDEWpiug=
+  before_deploy:
+    - cp .pioenvs/esp8285/firmware.bin sonoff_plug.bin
+    - cp .pioenvs/d1_mini/firmware.bin d1_mini.bin
   file:
-    - ".pioenvs/esp8285/firmware.bin"
-    - ".pioenvs/d1_mini/firmware.bin"
+    - "sonoff_plug.bin"
+    - "d1_mini.bin"
   on:
     repo: georgeF105/ioatt-device
