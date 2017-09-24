@@ -9,8 +9,6 @@
 #include <FirebaseArduino.h>
 #include <EEPROM.h>
 
-#include "config.h"
-
 #include <ioatt-device.h>
 
 #ifdef SONOFF_PLUG
