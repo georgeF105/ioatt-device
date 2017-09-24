@@ -28,7 +28,7 @@ DHT dht (DHT_PIN, DHT_TYPE);
 
 unsigned long lastOutputPollTime;
 
-IOATTDevice ioattDevice (VERSION, "TYPE", FIREBASE_HOST, FIREBASE_AUTH);
+IOATTDevice ioattDevice (VERSION, TYPE, FIREBASE_HOST, FIREBASE_AUTH);
 
 SensorConfig sensorConfig;
 OutputConfig outputConfig;

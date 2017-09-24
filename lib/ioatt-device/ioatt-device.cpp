@@ -146,7 +146,7 @@ void IOATTDevice::wipeDeviceKeyAndReboot () {
 
 void IOATTDevice::checkForUpdates () {
     Serial.println("checking for updates");
-    t_httpUpdate_return ret = ESPhttpUpdate.update(BUILD_SERVER_ADDRESS, 3000, String("/builds/fetch/") + String(_type), _version);
+    t_httpUpdate_return ret = ESPhttpUpdate.update(BUILD_SERVER_ADDRESS, 3000, String("/firmware/") + String(_type) + String(".bin"), _version);
   
     switch(ret) {
         case HTTP_UPDATE_FAILED:
