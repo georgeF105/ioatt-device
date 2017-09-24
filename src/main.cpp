@@ -16,20 +16,22 @@
 
 #include <ioatt-device.h>
 
+#ifdef SONOFF_PLUG
+#define TYPE "SONOFF_PLUG"
+#endif
 
-#define CURRENT_VERSION "0.0.3"
+#ifdef D1_MINI_DHT
 #define TYPE "D1_MINI_DHT"
-
 #define DHT_SENSOR_TYPE "DHT"
-#define DHT_PIN D4
+#define DHT_PIN 2
 #define DHT_TYPE DHT22
 unsigned long lastSensorPollTime;
+DHT dht (DHT_PIN, DHT_TYPE);
+#endif
 
-#define LED_PIN 2
 unsigned long lastOutputPollTime;
 
-IOATTDevice ioattDevice ("0.0.3", TYPE, FIREBASE_HOST, FIREBASE_AUTH);
-DHT dht (DHT_PIN, DHT_TYPE);
+IOATTDevice ioattDevice (VERSION, "TYPE", FIREBASE_HOST, FIREBASE_AUTH);
 
 SensorConfig sensorConfig;
 OutputConfig outputConfig;
@@ -42,18 +44,22 @@ boolean currentOutputState;
 void setup() {
     Serial.begin(115200);
     Serial.print("Starting Version: ");
-    Serial.print(CURRENT_VERSION);
+    Serial.print(VERSION);
     Serial.print(" Type: ");
     Serial.println(TYPE);
 
-    pinMode(LED_PIN, OUTPUT);
     pinMode(INPUT_BUTTON_PIN, INPUT_PULLUP);
 
     delay (500);    
     ioattDevice.startUp();
-    sensorConfig = ioattDevice.getSensorConfig();
     outputConfig = ioattDevice.getOutputConfig();
+
+    #ifdef D1_MINI_DHT
+    sensorConfig = ioattDevice.getSensorConfig();
+    Serial.println("Starting dht sensor");
     dht.begin();
+    #endif
+
     Serial.println("done setup");
     Serial.print("SensorConfig.type: ");
     Serial.println(sensorConfig.type);
@@ -67,6 +73,7 @@ void setup() {
     pinMode(outputConfig.pin, OUTPUT);
 }
 
+#ifdef D1_MINI_DHT
 void checkAndPushSensorData () {
     if (lastSensorPollTime + sensorConfig.pollRate < millis()) {
         lastSensorPollTime = millis();
@@ -77,6 +84,7 @@ void checkAndPushSensorData () {
         }
     }
 }
+#endif
 
 void setOutputState (boolean state) {
     currentOutputState = state;
@@ -107,7 +115,10 @@ void loop() {
     }
 
     pollAndUpdateOutputs();
+
+    #ifdef D1_MINI_DHT
     checkAndPushSensorData();
+    #endif
 
     delay(10);
 }
