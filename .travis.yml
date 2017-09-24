@@ -43,9 +43,10 @@ deploy:
   before_deploy:
     - cp .pioenvs/esp8285/firmware.bin ./sonoff_plug.bin
     - cp .pioenvs/d1_mini/firmware.bin ./d1_mini.bin
+    - echo "copyied files"
   file:
-    - "sonoff_plug.bin"
-    - "d1_mini.bin"
+    - "./sonoff_plug.bin"
+    - "./d1_mini.bin"
   on:
     repo: georgeF105/ioatt-device
     tags: true
