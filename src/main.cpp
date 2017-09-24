@@ -9,9 +9,6 @@
 #include <FirebaseArduino.h>
 #include <EEPROM.h>
 
-#include <Adafruit_Sensor.h>
-#include <DHT.h>
-
 #include "config.h"
 
 #include <ioatt-device.h>
@@ -21,6 +18,8 @@
 #endif
 
 #ifdef D1_MINI_DHT
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
 #define TYPE "D1_MINI_DHT"
 #define DHT_SENSOR_TYPE "DHT"
 #define DHT_PIN 2
