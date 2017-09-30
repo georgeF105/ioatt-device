@@ -12,13 +12,13 @@
 #include <ioatt-device.h>
 
 #ifdef SONOFF_PLUG
-#define TYPE "SONOFF_PLUG"
+#define TYPE "sonoff_plug"
 #endif
 
 #ifdef D1_MINI_DHT
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
-#define TYPE "D1_MINI_DHT"
+#define TYPE "d1_mini"
 #define DHT_SENSOR_TYPE "DHT"
 #define DHT_PIN 2
 #define DHT_TYPE DHT22
@@ -47,7 +47,7 @@ void setup() {
 
     pinMode(INPUT_BUTTON_PIN, INPUT_PULLUP);
 
-    delay (500);    
+    delay (500);
     ioattDevice.startUp();
     outputConfig = ioattDevice.getOutputConfig();
 

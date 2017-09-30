@@ -50,8 +50,8 @@ void IOATTDevice::startUp(void) {
           Serial.print("setup failed:");
           Serial.println(Firebase.error());  
       }
-      verifyDeviceMacAddress();
       checkForUpdates();
+      verifyDeviceMacAddress();
 }
 
 String IOATTDevice::deviceKey() {
@@ -125,6 +125,12 @@ void IOATTDevice::verifyDeviceMacAddress () {
     if (remoteMacAddress == MAC_ADDRESS_NOT_SET) {
       Firebase.setString(String("devices/") + String(_deviceKey) + String("/macAddress"), _macAddress);
       return;
+    }
+
+    if (Firebase.failed()) {
+        Serial.print("Firebase error fetching device mac address");
+        Serial.println(Firebase.error());
+        ESP.reset();
     }
   
     if (_macAddress != remoteMacAddress) {
