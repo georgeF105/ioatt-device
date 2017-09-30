@@ -119,6 +119,7 @@ void IOATTDevice::saveDeviceKeyToEEPROM () {
 }
 
 void IOATTDevice::verifyDeviceMacAddress () {
+    checkForFirebaseError();
     String remoteMacAddress = getRemoteMacAddress();
     checkForFirebaseError();
 

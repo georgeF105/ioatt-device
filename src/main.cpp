@@ -11,6 +11,8 @@
 
 #include <ioatt-device.h>
 
+// #include "config.h"
+
 #ifdef SONOFF_PLUG
 #define TYPE "sonoff_plug"
 #endif
