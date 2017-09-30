@@ -18,14 +18,15 @@
 #endif
 
 #ifdef D1_MINI_DHT
-#include <Adafruit_Sensor.h>
+// #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #define TYPE "d1_mini"
 #define DHT_SENSOR_TYPE "DHT"
 #define DHT_PIN 2
-#define DHT_TYPE DHT22
+// #define DHT_TYPE DHT22
 unsigned long lastSensorPollTime;
-DHT dht (DHT_PIN, DHT_TYPE);
+// DHT dht (DHT_PIN, DHT_TYPE);
+DHT dht;
 #endif
 
 unsigned long lastOutputPollTime;
@@ -56,7 +57,7 @@ void setup() {
     #ifdef D1_MINI_DHT
     sensorConfig = ioattDevice.getSensorConfig();
     Serial.println("Starting dht sensor");
-    dht.begin();
+    dht.setup(DHT_PIN);
     #endif
 
     Serial.println("done setup");
@@ -79,7 +80,7 @@ void checkAndPushSensorData () {
 
         if (sensorConfig.type == DHT_SENSOR_TYPE) {
             Serial.println("getting and pushing sensor data");
-            ioattDevice.pushSensorData(dht.readTemperature(), dht.readHumidity());
+            ioattDevice.pushSensorData(dht.getTemperature(), dht.getHumidity());
         }
     }
 }
