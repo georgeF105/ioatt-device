@@ -1,17 +1,9 @@
 #include <Arduino.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266WiFi.h>
-#include <DNSServer.h>
-#include <ESP8266WebServer.h>
-#include <WiFiManager.h>
-#include <ESP8266HTTPClient.h>
-#include <ESP8266httpUpdate.h>
-#include <FirebaseArduino.h>
-#include <EEPROM.h>
 
-#include <ioatt-device.h>
-
-// #include "config.h"
+#include "config.h"
+#include <ota-update.h>
+#include <wifi-connect.h>
+#include <storage.h>
 
 #ifdef SONOFF_PLUG
 #define TYPE "sonoff_plug"
@@ -31,15 +23,19 @@ DHT dht;
 
 unsigned long lastOutputPollTime;
 
-IOATTDevice ioattDevice (VERSION, TYPE, FIREBASE_HOST, FIREBASE_AUTH);
+// IOATTDevice ioattDevice (VERSION, TYPE, FIREBASE_HOST, FIREBASE_AUTH);
 
-SensorConfig sensorConfig;
-OutputConfig outputConfig;
+// SensorConfig sensorConfig;
+// OutputConfig outputConfig;
 
 #define INPUT_BUTTON_PIN 0
 #define INPUT_BUTTON_ON LOW
 #define INPUT_BUTTON_OFF HIGH
 boolean currentOutputState;
+
+Storage storage;
+WifiConnect wifiConnect (storage);
+OTAUpdate otaUpdate (TYPE);
 
 void setup() {
     Serial.begin(115200);
@@ -50,75 +46,85 @@ void setup() {
 
     pinMode(INPUT_BUTTON_PIN, INPUT_PULLUP);
 
+    wifiConnect.connect();
+    otaUpdate.checkForUpdate();
+
+
     delay (500);
-    ioattDevice.startUp();
-    outputConfig = ioattDevice.getOutputConfig();
+    // ioattDevice.startUp();
+    // outputConfig = ioattDevice.getOutputConfig();
 
     #ifdef D1_MINI_DHT
-    sensorConfig = ioattDevice.getSensorConfig();
-    Serial.println("Starting dht sensor");
-    dht.setup(DHT_PIN);
+    // sensorConfig = ioattDevice.getSensorConfig();
+    // Serial.println("Starting dht sensor");
+    // dht.setup(DHT_PIN);
     #endif
 
-    Serial.println("done setup");
-    Serial.print("SensorConfig.type: ");
-    Serial.println(sensorConfig.type);
-    Serial.print("SensorConfig.pollRate: ");
-    Serial.println(sensorConfig.pollRate);
+    // Serial.println("done setup");
+    // Serial.print("SensorConfig.type: ");
+    // Serial.println(sensorConfig.type);
+    // Serial.print("SensorConfig.pollRate: ");
+    // Serial.println(sensorConfig.pollRate);
 
-    Serial.print("outputConfig.pollRate: ");
-    Serial.println(outputConfig.pollRate);
-    Serial.print("outputConfig.pin: ");
-    Serial.println(outputConfig.pin);
-    pinMode(outputConfig.pin, OUTPUT);
+    // Serial.print("outputConfig.pollRate: ");
+    // Serial.println(outputConfig.pollRate);
+    // Serial.print("outputConfig.pin: ");
+    // Serial.println(outputConfig.pin);
+    // pinMode(outputConfig.pin, OUTPUT);
 }
 
-#ifdef D1_MINI_DHT
-void checkAndPushSensorData () {
-    if (lastSensorPollTime + sensorConfig.pollRate < millis()) {
-        lastSensorPollTime = millis();
+// #ifdef D1_MINI_DHT
+// void checkAndPushSensorData () {
+//     if (lastSensorPollTime + sensorConfig.pollRate < millis()) {
+//         lastSensorPollTime = millis();
 
-        if (sensorConfig.type == DHT_SENSOR_TYPE) {
-            Serial.println("getting and pushing sensor data");
-            ioattDevice.pushSensorData(dht.getTemperature(), dht.getHumidity());
-        }
-    }
-}
-#endif
+//         if (sensorConfig.type == DHT_SENSOR_TYPE) {
+//             Serial.println("getting and pushing sensor data");
+//             ioattDevice.pushSensorData(dht.getTemperature(), dht.getHumidity());
+//         }
+//     }
+// }
+// #endif
 
-void setOutputState (boolean state) {
-    currentOutputState = state;
-    if (state) {
-        Serial.println("Setting pin to on");
-        digitalWrite(outputConfig.pin, INPUT_BUTTON_ON);
-        ioattDevice.setDeviceActualValue(true);
-    } else {
-        Serial.println("Setting pin to off");
-        digitalWrite(outputConfig.pin, INPUT_BUTTON_OFF);
-        ioattDevice.setDeviceActualValue(false);
-    }
-}
+// void setOutputState (boolean state) {
+//     currentOutputState = state;
+//     if (state) {
+//         Serial.println("Setting pin to on");
+//         digitalWrite(outputConfig.pin, INPUT_BUTTON_ON);
+//         ioattDevice.setDeviceActualValue(true);
+//     } else {
+//         Serial.println("Setting pin to off");
+//         digitalWrite(outputConfig.pin, INPUT_BUTTON_OFF);
+//         ioattDevice.setDeviceActualValue(false);
+//     }
+// }
 
-void pollAndUpdateOutputs () {
-    if (lastOutputPollTime + outputConfig.pollRate < millis()) {
-        lastOutputPollTime = millis();
-        setOutputState(ioattDevice.getOutputTargetValue());
-    }
-}
+// void pollAndUpdateOutputs () {
+//     if (lastOutputPollTime + outputConfig.pollRate < millis()) {
+//         lastOutputPollTime = millis();
+//         setOutputState(ioattDevice.getOutputTargetValue());
+//     }
+// }
 
 void loop() {
     if (digitalRead(INPUT_BUTTON_PIN) == INPUT_BUTTON_ON) {
         Serial.println("Button pushed");
-        currentOutputState = !currentOutputState;
-        setOutputState(currentOutputState);
-        ioattDevice.setDeviceValue(currentOutputState);
+        // currentOutputState = !currentOutputState;
+        // setOutputState(currentOutputState);
+        // ioattDevice.setDeviceValue(currentOutputState);
     }
 
-    pollAndUpdateOutputs();
+    digitalWrite(4, INPUT_BUTTON_ON);
+    Serial.println("h1");
+    delay(1000);
+    digitalWrite(4, INPUT_BUTTON_OFF);
+    Serial.println("h2");
+    delay(1000);
+    // pollAndUpdateOutputs();
 
-    #ifdef D1_MINI_DHT
-    checkAndPushSensorData();
-    #endif
+    // #ifdef D1_MINI_DHT
+    // checkAndPushSensorData();
+    // #endif
 
-    delay(10);
+    // delay(10);
 }
