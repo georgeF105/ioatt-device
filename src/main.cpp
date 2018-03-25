@@ -10,15 +10,13 @@
 #endif
 
 #ifdef D1_MINI_DHT
-// #include <Adafruit_Sensor.h>
-#include <DHT.h>
+#include <dht-sensor.h>
+// #include <DHT.h>
 #define TYPE "d1_mini"
 #define DHT_SENSOR_TYPE "DHT"
-#define DHT_PIN 2
-// #define DHT_TYPE DHT22
 unsigned long lastSensorPollTime;
-// DHT dht (DHT_PIN, DHT_TYPE);
-DHT dht;
+DHTSensor dhtSensor(4000);
+// DHT dht;
 #endif
 
 unsigned long lastOutputPollTime;
@@ -37,6 +35,8 @@ Storage storage;
 WifiConnect wifiConnect (storage);
 OTAUpdate otaUpdate (TYPE);
 
+boolean hasWifiConnection;
+
 void setup() {
     Serial.begin(115200);
     Serial.print("Starting Version: ");
@@ -46,85 +46,24 @@ void setup() {
 
     pinMode(INPUT_BUTTON_PIN, INPUT_PULLUP);
 
-    wifiConnect.connect();
-    otaUpdate.checkForUpdate();
+    hasWifiConnection = wifiConnect.connect();
+    if (hasWifiConnection) {
+        Serial.println("connected");
+        otaUpdate.checkForUpdate();
+    }
 
 
     delay (500);
-    // ioattDevice.startUp();
-    // outputConfig = ioattDevice.getOutputConfig();
 
     #ifdef D1_MINI_DHT
-    // sensorConfig = ioattDevice.getSensorConfig();
-    // Serial.println("Starting dht sensor");
-    // dht.setup(DHT_PIN);
+    dhtSensor.init();
     #endif
-
-    // Serial.println("done setup");
-    // Serial.print("SensorConfig.type: ");
-    // Serial.println(sensorConfig.type);
-    // Serial.print("SensorConfig.pollRate: ");
-    // Serial.println(sensorConfig.pollRate);
-
-    // Serial.print("outputConfig.pollRate: ");
-    // Serial.println(outputConfig.pollRate);
-    // Serial.print("outputConfig.pin: ");
-    // Serial.println(outputConfig.pin);
-    // pinMode(outputConfig.pin, OUTPUT);
 }
 
-// #ifdef D1_MINI_DHT
-// void checkAndPushSensorData () {
-//     if (lastSensorPollTime + sensorConfig.pollRate < millis()) {
-//         lastSensorPollTime = millis();
-
-//         if (sensorConfig.type == DHT_SENSOR_TYPE) {
-//             Serial.println("getting and pushing sensor data");
-//             ioattDevice.pushSensorData(dht.getTemperature(), dht.getHumidity());
-//         }
-//     }
-// }
-// #endif
-
-// void setOutputState (boolean state) {
-//     currentOutputState = state;
-//     if (state) {
-//         Serial.println("Setting pin to on");
-//         digitalWrite(outputConfig.pin, INPUT_BUTTON_ON);
-//         ioattDevice.setDeviceActualValue(true);
-//     } else {
-//         Serial.println("Setting pin to off");
-//         digitalWrite(outputConfig.pin, INPUT_BUTTON_OFF);
-//         ioattDevice.setDeviceActualValue(false);
-//     }
-// }
-
-// void pollAndUpdateOutputs () {
-//     if (lastOutputPollTime + outputConfig.pollRate < millis()) {
-//         lastOutputPollTime = millis();
-//         setOutputState(ioattDevice.getOutputTargetValue());
-//     }
-// }
-
 void loop() {
-    if (digitalRead(INPUT_BUTTON_PIN) == INPUT_BUTTON_ON) {
-        Serial.println("Button pushed");
-        // currentOutputState = !currentOutputState;
-        // setOutputState(currentOutputState);
-        // ioattDevice.setDeviceValue(currentOutputState);
-    }
+    #ifdef D1_MINI_DHT
+        dhtSensor.update();
+    #endif
 
-    digitalWrite(4, INPUT_BUTTON_ON);
-    Serial.println("h1");
-    delay(1000);
-    digitalWrite(4, INPUT_BUTTON_OFF);
-    Serial.println("h2");
-    delay(1000);
-    // pollAndUpdateOutputs();
-
-    // #ifdef D1_MINI_DHT
-    // checkAndPushSensorData();
-    // #endif
-
-    // delay(10);
+    delay(10);
 }
