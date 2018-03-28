@@ -9,9 +9,9 @@
 #ifdef D1_MINI_DHT
 #define TYPE "d1_mini"
 #define USE_DHT_SENSOR
+#define DHT_PIN 2
 #endif
 
 #define REMOTE_SERVER_ADDRESS "192.168.1.25"
-#define DHT_PIN 2
 
 #endif
