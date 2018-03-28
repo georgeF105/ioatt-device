@@ -13,7 +13,7 @@ class DHTSensor {
   public: 
     DHTSensor (int updateRate);
     void init ();
-    void update ();
+    boolean update ();
     DHTSensorState getSensorState ();
     void checkAndPushState ();
 

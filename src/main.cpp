@@ -5,26 +5,12 @@
 #include <wifi-connect.h>
 #include <storage.h>
 
-#ifdef SONOFF_PLUG
-#define TYPE "sonoff_plug"
-#endif
-
-#ifdef D1_MINI_DHT
+#ifdef USE_DHT_SENSOR
 #include <dht-sensor.h>
-// #include <DHT.h>
-#define TYPE "d1_mini"
-#define DHT_SENSOR_TYPE "DHT"
-unsigned long lastSensorPollTime;
-DHTSensor dhtSensor(4000);
-// DHT dht;
+DHTSensor dhtSensor(30000); // update every 30 sec
 #endif
 
 unsigned long lastOutputPollTime;
-
-// IOATTDevice ioattDevice (VERSION, TYPE, FIREBASE_HOST, FIREBASE_AUTH);
-
-// SensorConfig sensorConfig;
-// OutputConfig outputConfig;
 
 #define INPUT_BUTTON_PIN 0
 #define INPUT_BUTTON_ON LOW
@@ -52,17 +38,18 @@ void setup() {
         otaUpdate.checkForUpdate();
     }
 
-
     delay (500);
 
-    #ifdef D1_MINI_DHT
+    #ifdef USE_DHT_SENSOR
     dhtSensor.init();
     #endif
 }
 
 void loop() {
-    #ifdef D1_MINI_DHT
-        dhtSensor.update();
+    #ifdef USE_DHT_SENSOR
+        if(dhtSensor.update()) {
+            Serial.println("Updated sensor!");
+        }
     #endif
 
     delay(10);

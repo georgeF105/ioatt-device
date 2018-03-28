@@ -14,11 +14,13 @@ void DHTSensor::init () {
   _dht.setup(DHT_PIN);
 }
 
-void DHTSensor::update () {
+boolean DHTSensor::update () {
   if (_lastUpdated + _updateRate < millis()) {
     _lastUpdated = millis();
     checkAndPushState();
+    return true;
   }
+  return false;
 }
 
 void DHTSensor::checkAndPushState () {
