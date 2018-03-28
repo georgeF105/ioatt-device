@@ -1,7 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-
 #ifdef SONOFF_PLUG
 #define TYPE "sonoff_plug"
 #endif
