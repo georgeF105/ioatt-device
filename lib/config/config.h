@@ -5,6 +5,10 @@
 #define TYPE "sonoff_plug"
 #endif
 
+#define INPUT_BUTTON_PIN 0
+#define INPUT_BUTTON_ON LOW
+#define INPUT_BUTTON_OFF HIGH
+
 #ifdef D1_MINI_DHT
 #define TYPE "d1_mini"
 #define USE_DHT_SENSOR

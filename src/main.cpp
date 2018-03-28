@@ -12,9 +12,6 @@ DHTSensor dhtSensor(30000); // update every 30 sec
 
 unsigned long lastOutputPollTime;
 
-#define INPUT_BUTTON_PIN 0
-#define INPUT_BUTTON_ON LOW
-#define INPUT_BUTTON_OFF HIGH
 boolean currentOutputState;
 
 Storage storage;
