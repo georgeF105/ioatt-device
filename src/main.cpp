@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "config.h"
+#include <config.h>
 #include <ota-update.h>
 #include <wifi-connect.h>
 #include <storage.h>
