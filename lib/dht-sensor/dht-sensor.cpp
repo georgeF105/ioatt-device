@@ -1,9 +1,10 @@
 #include "dht-sensor.h"
 
 #include <Arduino.h>
-#include <config.h>
 #include <DHT.h>
 #include <ESP8266HTTPClient.h>
+
+#define DHT_PIN 2
 
 DHTSensor::DHTSensor (int updateRate) {
   _updateRate = updateRate;

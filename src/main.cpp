@@ -1,6 +1,5 @@
 #include <Arduino.h>
 
-#include <config.h>
 #include <ota-update.h>
 #include <wifi-connect.h>
 #include <storage.h>
@@ -9,6 +8,12 @@
 #include <dht-sensor.h>
 DHTSensor dhtSensor(30000); // update every 30 sec
 #endif
+
+#define INPUT_BUTTON_PIN 0
+#define INPUT_BUTTON_ON LOW
+#define INPUT_BUTTON_OFF HIGH
+
+#define DHT_PIN 2
 
 unsigned long lastOutputPollTime;
 

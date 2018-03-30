@@ -1,5 +1,4 @@
 #include "ota-update.h"
-#include "config.h"
 
 #include <Arduino.h>
 #include <ESP8266httpUpdate.h>
