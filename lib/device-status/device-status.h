@@ -9,7 +9,7 @@
 
 class DeviceStatus {
   public:
-    DeviceStatus (int updateRate);
+    DeviceStatus (void);
     void fetchStatus ();
     boolean update ();
     int getInt (char *valueName);

@@ -6,8 +6,8 @@
 
 #define DEVICE_STATUS_ENDPOINT "/deviceStatus"
 
-DeviceStatus::DeviceStatus (int updateRate) {
-  _updateRate = updateRate;
+DeviceStatus::DeviceStatus () {
+  _updateRate = 10000;
   _lastUpdated = millis();
 }
 
@@ -50,11 +50,11 @@ int DeviceStatus::getInt (char *valueName) {
   JsonObject& payloadJson = jsonBuffer.parseObject(_payload);
 
   if (!payloadJson.success()) {
-    Serial.print("failed to parseObject");
+    Serial.print("failed to payload: ");
+    Serial.println(_payload);
   }
 
   int value = payloadJson[valueName];
-  payloadJson.prettyPrintTo(Serial);
 
   return value;
 }

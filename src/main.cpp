@@ -5,6 +5,7 @@
 #include <storage.h>
 #include <device-config.h>
 #include <device-status.h>
+#include <pwm-output.h>
 
 // #ifdef USE_DHT_SENSOR
 #include <dht-sensor.h>
@@ -18,6 +19,7 @@ DHTSensor dhtSensor(30000); // update every 30 sec
 #define DHT_PIN 2
 
 #define PWN_PIN 2
+
 int pwmValue = 0;
 unsigned long lastOutputPollTime;
 
@@ -27,7 +29,8 @@ Storage storage;
 WifiConnect wifiConnect (storage);
 OTAUpdate otaUpdate (TYPE);
 DeviceConfig deviceConfig;
-DeviceStatus deviceStatus (10000);
+DeviceStatus deviceStatus;
+PWMOutput pwmOutout (5000, PWN_PIN, &deviceStatus);
 
 boolean hasWifiConnection;
 
@@ -39,7 +42,6 @@ void setup() {
     Serial.println(TYPE);
 
     pinMode(INPUT_BUTTON_PIN, INPUT_PULLUP);
-    pinMode(PWN_PIN, OUTPUT);
 
     hasWifiConnection = wifiConnect.connect();
     if (hasWifiConnection) {
@@ -68,10 +70,10 @@ void loop() {
     }
 
     if (deviceConfig.hasPWMLight) {
-        pwmValue = deviceStatus.getInt("pwmValue");
-
-        analogWrite(PWN_PIN, pwmValue);
+        if (pwmOutout.update()) {
+            Serial.println("pwm updated");
+        }
     }
 
-    delay(100);
+    delay(10);
 }
