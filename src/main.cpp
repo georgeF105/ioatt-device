@@ -4,6 +4,7 @@
 #include <wifi-connect.h>
 #include <storage.h>
 #include <device-config.h>
+#include <device-status.h>
 
 // #ifdef USE_DHT_SENSOR
 #include <dht-sensor.h>
@@ -26,6 +27,7 @@ Storage storage;
 WifiConnect wifiConnect (storage);
 OTAUpdate otaUpdate (TYPE);
 DeviceConfig deviceConfig;
+DeviceStatus deviceStatus (10000);
 
 boolean hasWifiConnection;
 
@@ -44,6 +46,7 @@ void setup() {
         Serial.println("connected");
         otaUpdate.checkForUpdate();
         deviceConfig.fetch();
+        deviceStatus.fetchStatus();
     }
 
     delay (200);
@@ -54,6 +57,10 @@ void setup() {
 }
 
 void loop() {
+    if (deviceStatus.update()) {
+        Serial.println("Updated status");
+    }
+
     if (deviceConfig.hasDHTSensor) {
         if(dhtSensor.update()) {
             Serial.println("Updated sensor!");
@@ -61,13 +68,7 @@ void loop() {
     }
 
     if (deviceConfig.hasPWMLight) {
-        pwmValue++;
-
-        if(pwmValue > 255) {
-            pwmValue = 0;
-        }
-        Serial.print("Setting pwm to ");
-        Serial.println(pwmValue);
+        pwmValue = deviceStatus.getInt("pwmValue");
 
         analogWrite(PWN_PIN, pwmValue);
     }
