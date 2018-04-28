@@ -3,12 +3,15 @@
 #include <Arduino.h>
 
 #include <ESP8266HTTPClient.h>
+#include <storage.h>
 
 #define DEVICE_STATUS_ENDPOINT "/deviceStatus"
 
-DeviceStatus::DeviceStatus () {
-  _updateRate = 10000;
+DeviceStatus::DeviceStatus (int updateRate, Storage *storage) {
+  _updateRate = updateRate;
   _lastUpdated = millis();
+  _storage = storage;
+  _deviceKey = _storage->getDeviceKey();
 }
 
 boolean DeviceStatus::update () {
@@ -25,6 +28,7 @@ void DeviceStatus::fetchStatus () {
   String url = String("http://") + String(REMOTE_SERVER_ADDRESS) + String(":3000") + String(DEVICE_STATUS_ENDPOINT);
   Serial.println(url);
   http.begin(url);
+  http.addHeader("deviceKey", _deviceKey);
 
   _httpCode = http.GET();
 
@@ -46,6 +50,20 @@ void DeviceStatus::fetchStatus () {
 }
 
 int DeviceStatus::getInt (char *valueName) {
+  StaticJsonBuffer<JSON_SIZE> jsonBuffer;
+  JsonObject& payloadJson = jsonBuffer.parseObject(_payload);
+
+  if (!payloadJson.success()) {
+    Serial.print("failed to payload: ");
+    Serial.println(_payload);
+  }
+
+  int value = payloadJson[valueName];
+
+  return value;
+}
+
+boolean DeviceStatus::getBoolean (char *valueName) {
   StaticJsonBuffer<JSON_SIZE> jsonBuffer;
   JsonObject& payloadJson = jsonBuffer.parseObject(_payload);
 

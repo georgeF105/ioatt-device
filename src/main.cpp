@@ -29,8 +29,8 @@ Storage storage;
 WifiConnect wifiConnect (storage);
 OTAUpdate otaUpdate (TYPE);
 DeviceConfig deviceConfig;
-DeviceStatus deviceStatus;
-PWMOutput pwmOutout (5000, PWN_PIN, &deviceStatus);
+DeviceStatus deviceStatus (10000, &storage);
+PWMOutput pwmOutout (1000, PWN_PIN, &deviceStatus, 50, 800);
 
 boolean hasWifiConnection;
 
@@ -71,7 +71,7 @@ void loop() {
 
     if (deviceConfig.hasPWMLight) {
         if (pwmOutout.update()) {
-            Serial.println("pwm updated");
+            // Serial.println("pwm updated");
         }
     }
 

@@ -4,19 +4,23 @@
 #include <Arduino.h>
 #include <ESP8266HTTPClient.h>
 #include <ArduinoJson.h>
+#include <storage.h>
 
 #define JSON_SIZE 200
 
 class DeviceStatus {
   public:
-    DeviceStatus (void);
+    DeviceStatus (int updateRate, Storage *storage);
     void fetchStatus ();
     boolean update ();
     int getInt (char *valueName);
+    boolean getBoolean (char *valueName);
 
   private:
     int _updateRate;
     int _lastUpdated;
+    Storage *_storage;
+    String _deviceKey;
     String _payload;
     int _httpCode;
 };
