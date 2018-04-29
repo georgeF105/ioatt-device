@@ -4,6 +4,7 @@
 
 #include <ESP8266HTTPClient.h>
 #include <storage.h>
+#include <WebSocketsClient.h>
 
 #define DEVICE_STATUS_ENDPOINT "/deviceStatus"
 
@@ -12,14 +13,22 @@ DeviceStatus::DeviceStatus (int updateRate, Storage *storage) {
   _lastUpdated = millis();
   _storage = storage;
   _deviceKey = _storage->getDeviceKey();
+
+  _webSocket.begin(REMOTE_SERVER_ADDRESS, 4081, "/");
+  Serial.println("DeviceStatus::DeviceStatus");
+  _webSocket.onEvent([this](WStype_t type, uint8_t * payload, size_t length) {
+    _webSocketEvent(type, payload, length);
+  });
+  _webSocket.setReconnectInterval(5000);
 }
 
 boolean DeviceStatus::update () {
-  if (_lastUpdated + _updateRate < millis()) {
-    _lastUpdated = millis();
-    fetchStatus();
-    return true;
-  }
+  _webSocket.loop();
+  // if (_lastUpdated + _updateRate < millis()) {
+  //   _lastUpdated = millis();
+  //   fetchStatus();
+  //   return true;
+  // }
   return false;
 }
 
@@ -54,7 +63,7 @@ int DeviceStatus::getInt (char *valueName) {
   JsonObject& payloadJson = jsonBuffer.parseObject(_payload);
 
   if (!payloadJson.success()) {
-    Serial.print("failed to payload: ");
+    Serial.print("failed to parse payload: ");
     Serial.println(_payload);
   }
 
@@ -75,4 +84,38 @@ boolean DeviceStatus::getBoolean (char *valueName) {
   int value = payloadJson[valueName];
 
   return value;
+}
+
+void DeviceStatus::_webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+
+	switch(type) {
+		case WStype_DISCONNECTED: {
+			Serial.printf("[WSc] Disconnected!\n");
+      _payload = "";
+    }
+			break;
+		case WStype_CONNECTED: {
+			Serial.printf("[WSc] Connected to url: %s\n", payload);
+
+			// send message to server when Connected
+			_webSocket.sendTXT(_deviceKey);
+		}
+			break;
+		case WStype_TEXT:
+			Serial.printf("[WSc] get text: %s\n", payload);
+
+      _payload = String((char *)payload);
+
+			// send message to server
+			// _webSocket.sendTXT("message here");
+			break;
+		case WStype_BIN:
+			Serial.printf("[WSc] get binary length: %u\n", length);
+			hexdump(payload, length);
+
+      _payload = String(*payload);
+			// send data to server
+			// _webSocket.sendBIN(payload, length);
+			break;
+	}
 }

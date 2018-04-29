@@ -7,6 +7,8 @@
 #include <device-status.h>
 #include <pwm-output.h>
 
+#include <WebSocketsClient.h>
+
 // #ifdef USE_DHT_SENSOR
 #include <dht-sensor.h>
 DHTSensor dhtSensor(30000); // update every 30 sec
@@ -74,6 +76,4 @@ void loop() {
             // Serial.println("pwm updated");
         }
     }
-
-    delay(10);
 }

@@ -5,6 +5,7 @@
 #include <ESP8266HTTPClient.h>
 #include <ArduinoJson.h>
 #include <storage.h>
+#include <WebSocketsClient.h>
 
 #define JSON_SIZE 200
 
@@ -23,5 +24,7 @@ class DeviceStatus {
     String _deviceKey;
     String _payload;
     int _httpCode;
+    WebSocketsClient _webSocket;
+    void _webSocketEvent (WStype_t type, uint8_t * payload, size_t length);
 };
 #endif

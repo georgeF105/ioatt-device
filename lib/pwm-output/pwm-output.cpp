@@ -26,14 +26,14 @@ boolean PWMOutput::update () {
 }
 
 void PWMOutput::setOutput () {
-  int newPWMValue = _deviceStatus->getInt("boolState");
+  int newPWMValue = _deviceStatus->getInt("pwmState");
 
   if (newPWMValue > _pwmValue && newPWMValue <=_maxValue) {
-    _pwmValue++;
+    _pwmValue = newPWMValue;
   }
 
   if (newPWMValue < _pwmValue && newPWMValue >= 0) {
-    _pwmValue--;
+    _pwmValue = newPWMValue;
   }
 
   // if (newPWMValue && _pwmValue < _maxValue) {
