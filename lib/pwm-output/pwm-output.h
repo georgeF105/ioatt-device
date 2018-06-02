@@ -11,7 +11,7 @@ class PWMOutput {
 
   private:
     int _updateRate;
-    int _lastUpdated;
+    unsigned long _lastUpdated;
     int _outputPin;
     int _pwmValue;
     void setOutput ();

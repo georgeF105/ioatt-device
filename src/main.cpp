@@ -31,17 +31,18 @@ Storage storage;
 WifiConnect wifiConnect (storage);
 OTAUpdate otaUpdate (TYPE);
 DeviceConfig deviceConfig;
-DeviceStatus deviceStatus (10000, &storage);
-PWMOutput pwmOutout (1000, PWN_PIN, &deviceStatus, 50, 800);
+DeviceStatus deviceStatus (&storage);
+PWMOutput pwmOutout (5000, PWN_PIN, &deviceStatus, 50, 800);
 
 boolean hasWifiConnection;
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(9600);
     Serial.print("Starting Version: ");
     Serial.print(VERSION);
     Serial.print(" Type: ");
     Serial.println(TYPE);
+    Serial.setDebugOutput(true);
 
     pinMode(INPUT_BUTTON_PIN, INPUT_PULLUP);
 
@@ -61,9 +62,7 @@ void setup() {
 }
 
 void loop() {
-    if (deviceStatus.update()) {
-        Serial.println("Updated status");
-    }
+    deviceStatus.loop();
 
     if (deviceConfig.hasDHTSensor) {
         if(dhtSensor.update()) {

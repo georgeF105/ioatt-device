@@ -8,18 +8,19 @@
 #include <WebSocketsClient.h>
 
 #define JSON_SIZE 200
+#define PING_RATE 10000 
 
 class DeviceStatus {
   public:
-    DeviceStatus (int updateRate, Storage *storage);
+    DeviceStatus (Storage *storage);
     void fetchStatus ();
-    boolean update ();
+    void loop ();
     int getInt (char *valueName);
     boolean getBoolean (char *valueName);
 
   private:
-    int _updateRate;
-    int _lastUpdated;
+    unsigned long _lastUpdated;
+    int _pingFailCount;
     Storage *_storage;
     String _deviceKey;
     String _payload;

@@ -8,11 +8,11 @@
 
 #define DEVICE_STATUS_ENDPOINT "/deviceStatus"
 
-DeviceStatus::DeviceStatus (int updateRate, Storage *storage) {
-  _updateRate = updateRate;
+DeviceStatus::DeviceStatus (Storage *storage) {
   _lastUpdated = millis();
   _storage = storage;
   _deviceKey = _storage->getDeviceKey();
+  _pingFailCount = 0;
 
   _webSocket.begin(REMOTE_SERVER_ADDRESS, 4081, "/");
   Serial.println("DeviceStatus::DeviceStatus");
@@ -22,14 +22,23 @@ DeviceStatus::DeviceStatus (int updateRate, Storage *storage) {
   _webSocket.setReconnectInterval(5000);
 }
 
-boolean DeviceStatus::update () {
+void DeviceStatus::loop () {
   _webSocket.loop();
-  // if (_lastUpdated + _updateRate < millis()) {
-  //   _lastUpdated = millis();
-  //   fetchStatus();
-  //   return true;
-  // }
-  return false;
+  if (_lastUpdated + PING_RATE < millis()) {
+    _lastUpdated = millis();
+
+    boolean pingSent = _webSocket.sendPing();
+    if (!pingSent) {
+      _pingFailCount++;
+    } else {
+      _pingFailCount = 0;
+    }
+
+    if (_pingFailCount > 5) {
+      Serial.println("ERROR pingFailCount > 5; restarting esp");
+      ESP.restart();
+    }
+  }
 }
 
 void DeviceStatus::fetchStatus () {
@@ -87,7 +96,6 @@ boolean DeviceStatus::getBoolean (char *valueName) {
 }
 
 void DeviceStatus::_webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
-
 	switch(type) {
 		case WStype_DISCONNECTED: {
 			Serial.printf("[WSc] Disconnected!\n");

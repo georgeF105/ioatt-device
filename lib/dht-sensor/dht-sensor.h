@@ -19,7 +19,7 @@ class DHTSensor {
 
   private:
     int _updateRate;
-    int _lastUpdated;
+    unsigned long _lastUpdated;
     DHT _dht;
     void pushSensorState(DHTSensorState state);
 };

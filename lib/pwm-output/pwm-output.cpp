@@ -2,6 +2,10 @@
 #include <Arduino.h>
 #include <device-status.h>
 
+extern "C" {
+  #include "user_interface.h"
+}
+
 PWMOutput::PWMOutput (int updateRate, int outputPin, DeviceStatus *deviceStatus, int increaseRate, int maxValue) {
   _updateRate = updateRate;
   _lastUpdated = millis();
@@ -53,7 +57,10 @@ void PWMOutput::setOutput () {
   // }
   // Serial.print("UpdateRate");
   // Serial.println(_currentUpdateRate);
-  Serial.print("pwmValue: ");
-  Serial.println(_pwmValue);
+  // Serial.print("pwmValue: ");
+  // Serial.println(_pwmValue);
+
+  Serial.print("system_get_free_heap_size: ");
+  Serial.println(system_get_free_heap_size());
   analogWrite(_outputPin, _pwmValue);
 }
